@@ -45,11 +45,17 @@ RUN cd / \
 
 # Download the CAS overlay project \
 RUN cd / \
-    && git clone --depth 1 --single-branch https://github.com/apereo/cas-overlay-template.git cas-overlay \
+    && git clone -b 5.3 --depth 1 --single-branch https://github.com/apereo/cas-overlay-template.git cas-overlay \
     && mkdir -p /etc/cas \
     && mkdir -p cas-overlay/bin;
 
-COPY thekeystore /etc/cas/
+#COPY thekeystore /etc/cas/
+#COPY cas.cer /etc/cas/
+
+RUN /opt/zulu$zulu_version-jdk$java_version-linux_x64/bin/keytool -genkeypair -alias cas -keyalg RSA -keypass changeit -storepass changeit -keystore /etc/cas/thekeystore -dname "CN=cas.example.org,OU=Example,OU=Org,C=US" -ext SAN="dns:example.org,dns:localhost,ip:127.0.0.1"
+
+RUN /opt/zulu$zulu_version-jdk$java_version-linux_x64/bin/keytool -exportcert -alias cas -storepass changeit -keystore /etc/cas/thekeystore -file /etc/cas/cas.cer
+
 COPY bin/*.* cas-overlay/bin/
 COPY etc/cas/config/*.* /cas-overlay/etc/cas/config/
 COPY etc/cas/services/*.* /cas-overlay/etc/cas/services/
