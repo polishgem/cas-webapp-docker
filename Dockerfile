@@ -49,12 +49,8 @@ RUN cd / \
     && mkdir -p /etc/cas \
     && mkdir -p cas-overlay/bin;
 
-#COPY thekeystore /etc/cas/
-#COPY cas.cer /etc/cas/
-
-RUN /opt/jre-home/bin/keytool -genkeypair -alias cas -keyalg RSA -keypass changeit -storepass changeit -keystore /etc/cas/thekeystore -dname "CN=cas.example.org,OU=Example,OU=Org,C=US" -ext SAN="dns:example.org,dns:localhost,ip:127.0.0.1"
-
-RUN /opt/jre-home/bin/keytool -exportcert -alias cas -storepass changeit -keystore /etc/cas/thekeystore -file /etc/cas/cas.cer
+COPY thekeystore /etc/cas/
+COPY cas.cer /etc/cas/
 
 RUN echo y | /opt/jre-home/bin/keytool -import -alias cas -storepass changeit -keystore /opt/jre-home/lib/security/cacerts -file /etc/cas/cas.cer
 
